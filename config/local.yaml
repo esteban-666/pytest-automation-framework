@@ -1,0 +1,61 @@
+# Local Environment Configuration for UI Testing
+web:
+  base_url: "http://localhost:3000"
+  implicit_wait: 10
+  explicit_wait: 20
+  page_load_timeout: 30
+  window_size:
+    width: 1920
+    height: 1080
+
+api:
+  base_url: "http://localhost:8000"
+  timeout: 30
+  headers:
+    Content-Type: "application/json"
+    Accept: "application/json"
+
+browser:
+  name: "chrome"
+  headless: false
+  download_path: "./downloads"
+  user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+
+reporting:
+  html_report: true
+  json_report: true
+  xml_report: true
+  screenshot_on_failure: true
+  video_recording: false
+
+parallel:
+  enabled: false
+  workers: 1
+  max_workers: 1
+
+retry:
+  enabled: true
+  max_retries: 1
+  retry_delay: 1
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/test.log"
+
+# Test data
+test_data:
+  users:
+    demoqa:
+      username: "testuser"
+      password: "TestPass123!"
+    the_internet:
+      username: "tomsmith"
+      password: "SuperSecretPassword!"
+
+# Feature flags
+features:
+  new_ui: true
+  api_v2: false
+  mobile_testing: false
+  performance_testing: false 

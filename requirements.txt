@@ -1,0 +1,26 @@
+# Core Testing Framework
+pytest>=7.0.0
+pytest-html>=3.1.0
+pytest-xdist>=3.0.0
+pytest-cov>=4.0.0
+pytest-metadata>=2.0.0
+pytest-rerunfailures>=11.0.0
+
+# Web Testing
+selenium>=4.10.0
+webdriver-manager>=3.8.0
+
+# API Testing
+requests>=2.31.0
+
+# Data Handling
+PyYAML>=6.0
+python-dotenv>=1.0.0
+
+# Logging
+loguru>=0.7.0
+
+# Development Tools
+black>=23.0.0
+flake8>=6.0.0
+isort>=5.12.0
