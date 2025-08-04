@@ -55,6 +55,10 @@ class TestDemoQA:
             )
             print("   🌐 Navigating to https://demoqa.com/automation-practice-form")
             self.driver.get("https://demoqa.com/automation-practice-form")
+            
+            # Wait for page to fully load
+            print("   ⏳ Waiting for page to fully load...")
+            self.page.wait_for_page_load(30)
             print("   ✅ Practice form page loaded")
 
             # ===== STEP 2: FILL PERSONAL INFORMATION =====
@@ -67,19 +71,66 @@ class TestDemoQA:
 
             print("   👤 Entering first name: John")
             self.page.type_text((By.ID, "firstName"), "John")
+            import time
+            time.sleep(1)  # Small wait for stability
 
             print("   👤 Entering last name: Doe")
             self.page.type_text((By.ID, "lastName"), "Doe")
+            time.sleep(1)  # Small wait for stability
 
             print("   📧 Entering email: john.doe@example.com")
             self.page.type_text((By.ID, "userEmail"), "john.doe@example.com")
+            time.sleep(1)  # Small wait for stability
             print("   ✅ Personal information filled")
 
             # ===== STEP 3: SELECT GENDER =====
             self.log_step("STEP 3", "Select gender option", "Male gender selected")
             print("   👨 Selecting gender: Male")
-            self.page.click_element((By.XPATH, "//input[@value='Male']"))
-            print("   ✅ Gender selected")
+            
+            # Try multiple approaches to select gender
+            gender_selected = False
+            
+            # Approach 1: Try clicking the radio button directly
+            try:
+                print("   🔍 Attempting to click gender radio button...")
+                self.page.click_element((By.XPATH, "//input[@value='Male']"))
+                gender_selected = True
+                print("   ✅ Gender selected via direct click")
+            except Exception as e:
+                print(f"   ⚠️ Direct click failed: {e}")
+                
+                # Approach 2: Try clicking the label instead
+                try:
+                    print("   🔍 Attempting to click gender label...")
+                    self.page.click_element((By.XPATH, "//label[contains(text(), 'Male')]"))
+                    gender_selected = True
+                    print("   ✅ Gender selected via label click")
+                except Exception as e2:
+                    print(f"   ⚠️ Label click failed: {e2}")
+                    
+                    # Approach 3: Use JavaScript click
+                    try:
+                        print("   🔍 Attempting JavaScript click...")
+                        gender_element = self.page.find_element((By.XPATH, "//input[@value='Male']"))
+                        self.driver.execute_script("arguments[0].click();", gender_element)
+                        gender_selected = True
+                        print("   ✅ Gender selected via JavaScript click")
+                    except Exception as e3:
+                        print(f"   ⚠️ JavaScript click failed: {e3}")
+                        
+                        # Approach 4: Try scrolling to element first
+                        try:
+                            print("   🔍 Attempting scroll + click...")
+                            self.page.scroll_to_element((By.XPATH, "//input[@value='Male']"))
+                            self.page.click_element((By.XPATH, "//input[@value='Male']"))
+                            gender_selected = True
+                            print("   ✅ Gender selected via scroll + click")
+                        except Exception as e4:
+                            print(f"   ❌ All gender selection methods failed: {e4}")
+                            raise Exception("Failed to select gender after trying all methods")
+            
+            if not gender_selected:
+                raise Exception("Gender selection failed")
 
             # ===== STEP 4: ENTER MOBILE NUMBER =====
             self.log_step(
@@ -87,6 +138,7 @@ class TestDemoQA:
             )
             print("   📱 Entering mobile number: 1234567890")
             self.page.type_text((By.ID, "userNumber"), "1234567890")
+            time.sleep(1)  # Small wait for stability
             print("   ✅ Mobile number entered")
 
             # ===== STEP 5: SELECT DATE OF BIRTH =====
@@ -106,8 +158,51 @@ class TestDemoQA:
             # ===== STEP 7: SELECT HOBBIES =====
             self.log_step("STEP 7", "Select hobbies", "Sports hobby selected")
             print("   ⚽ Selecting hobby: Sports")
-            self.page.click_element((By.XPATH, "//input[@value='Sports']"))
-            print("   ✅ Hobby selected")
+            
+            # Try multiple approaches to select hobby
+            hobby_selected = False
+            
+            # Approach 1: Try clicking the checkbox directly
+            try:
+                print("   🔍 Attempting to click hobby checkbox...")
+                self.page.click_element((By.XPATH, "//input[@value='Sports']"))
+                hobby_selected = True
+                print("   ✅ Hobby selected via direct click")
+            except Exception as e:
+                print(f"   ⚠️ Direct click failed: {e}")
+                
+                # Approach 2: Try clicking the label instead
+                try:
+                    print("   🔍 Attempting to click hobby label...")
+                    self.page.click_element((By.XPATH, "//label[contains(text(), 'Sports')]"))
+                    hobby_selected = True
+                    print("   ✅ Hobby selected via label click")
+                except Exception as e2:
+                    print(f"   ⚠️ Label click failed: {e2}")
+                    
+                    # Approach 3: Use JavaScript click
+                    try:
+                        print("   🔍 Attempting JavaScript click...")
+                        hobby_element = self.page.find_element((By.XPATH, "//input[@value='Sports']"))
+                        self.driver.execute_script("arguments[0].click();", hobby_element)
+                        hobby_selected = True
+                        print("   ✅ Hobby selected via JavaScript click")
+                    except Exception as e3:
+                        print(f"   ⚠️ JavaScript click failed: {e3}")
+                        
+                        # Approach 4: Try scrolling to element first
+                        try:
+                            print("   🔍 Attempting scroll + click...")
+                            self.page.scroll_to_element((By.XPATH, "//input[@value='Sports']"))
+                            self.page.click_element((By.XPATH, "//input[@value='Sports']"))
+                            hobby_selected = True
+                            print("   ✅ Hobby selected via scroll + click")
+                        except Exception as e4:
+                            print(f"   ❌ All hobby selection methods failed: {e4}")
+                            raise Exception("Failed to select hobby after trying all methods")
+            
+            if not hobby_selected:
+                raise Exception("Hobby selection failed")
 
             # ===== STEP 8: ENTER ADDRESS =====
             self.log_step("STEP 8", "Enter current address", "Address field populated")
@@ -147,7 +242,9 @@ class TestDemoQA:
 
         except Exception as e:
             print(f"\n❌ Test failed: {e}")
+            print("📄 Logging page HTML for debugging...")
             self.log_page_html("demoqa_form_submission")
+            print("📄 Page HTML logged to: logs/demoqa_form_submission_page.html")
             raise e
 
     def testDragDrop(self):
