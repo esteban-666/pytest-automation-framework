@@ -25,6 +25,55 @@ class BasePage:
         """Initialize base page with webdriver."""
         self.driver = driver
         self.wait = WebDriverWait(driver, 20)
+        self.auto_click_outside = True  # Enable auto-click outside by default
+
+    def click_outside_form(self):
+        """Click outside the form to dismiss any dropdowns or overlays."""
+        try:
+            # Try to click on a safe area outside the form (header, footer, or body margins)
+            safe_areas = [
+                (By.TAG_NAME, "header"),
+                (By.TAG_NAME, "footer"), 
+                (By.TAG_NAME, "body"),
+            ]
+            
+            for area_locator in safe_areas:
+                try:
+                    element = self.driver.find_element(*area_locator)
+                    # Click at a safe coordinate within the element
+                    self.driver.execute_script("arguments[0].click();", element)
+                    logger.debug("🎯 Clicked outside form to dismiss overlays")
+                    break
+                except:
+                    continue
+            
+            # Alternative: Click at a safe coordinate on the page (top-left area)
+            try:
+                self.driver.execute_script("document.elementFromPoint(50, 50).click();")
+            except:
+                pass
+            
+        except Exception as e:
+            logger.debug(f"Could not click outside form: {e}")
+            # Not critical, continue without throwing error
+
+    def dismiss_overlays(self):
+        """Dismiss any interfering overlays or dropdowns."""
+        try:
+            # Dismiss any active dropdowns by blurring active element
+            self.driver.execute_script("document.activeElement.blur();")
+            
+            # Press Escape key to close any modals/dropdowns
+            from selenium.webdriver.common.keys import Keys
+            from selenium.webdriver.common.action_chains import ActionChains
+            ActionChains(self.driver).send_keys(Keys.ESCAPE).perform()
+            
+            # Click outside if auto-click is enabled
+            if self.auto_click_outside:
+                self.click_outside_form()
+                
+        except Exception as e:
+            logger.debug(f"Could not dismiss overlays: {e}")
 
     def find_element(self, locator: Tuple[str, str], timeout: int = 20) -> WebElement:
         """Find element with explicit wait."""
@@ -56,6 +105,9 @@ class BasePage:
             wait = WebDriverWait(self.driver, timeout)
             element = wait.until(EC.element_to_be_clickable(locator))
             element.click()
+            # Auto-dismiss overlays after successful click
+            if self.auto_click_outside:
+                self.dismiss_overlays()
             return
         except ElementClickInterceptedException:
             logger.warning(f"Direct click failed: {locator}. Trying alternatives...")
@@ -68,6 +120,9 @@ class BasePage:
             element = self.find_element(locator, timeout=5)
             self.driver.execute_script("arguments[0].click();", element)
             logger.info("✅ JavaScript click successful")
+            # Auto-dismiss overlays after successful click
+            if self.auto_click_outside:
+                self.dismiss_overlays()
             return
         except Exception:
             logger.warning("JavaScript click failed, trying next method...")
@@ -77,6 +132,9 @@ class BasePage:
             element = self.find_element(locator, timeout=5)
             ActionChains(self.driver).move_to_element(element).click().perform()
             logger.info("✅ Action chains click successful")
+            # Auto-dismiss overlays after successful click
+            if self.auto_click_outside:
+                self.dismiss_overlays()
             return
         except Exception:
             logger.warning("Action chains click failed, trying next method...")
@@ -88,6 +146,9 @@ class BasePage:
             time.sleep(0.5)  # Allow scroll to complete
             element.click()
             logger.info("✅ Scroll + click successful")
+            # Auto-dismiss overlays after successful click
+            if self.auto_click_outside:
+                self.dismiss_overlays()
             return
         except Exception:
             logger.warning("Scroll + click failed, trying final method...")
@@ -103,6 +164,9 @@ class BasePage:
                 f"document.elementFromPoint({x}, {y}).click();"
             )
             logger.info("✅ Coordinate click successful")
+            # Auto-dismiss overlays after successful click
+            if self.auto_click_outside:
+                self.dismiss_overlays()
             return
         except Exception as e:
             logger.error(f"All click methods failed for {locator}: {e}")
@@ -115,6 +179,9 @@ class BasePage:
             element = wait.until(EC.presence_of_element_located(locator))
             element.clear()
             element.send_keys(text)
+            # Auto-dismiss overlays after successful text input
+            if self.auto_click_outside:
+                self.dismiss_overlays()
         except TimeoutException:
             logger.error(f"Failed to type text within {timeout} seconds: {locator}")
             raise
@@ -238,6 +305,9 @@ class BasePage:
 
             select = Select(element)
             select.select_by_visible_text(option_text)
+            # Auto-dismiss overlays after successful selection
+            if self.auto_click_outside:
+                self.dismiss_overlays()
         except TimeoutException:
             logger.error(
                 f"Failed to select option by text within {timeout} seconds: {locator}"
@@ -255,6 +325,9 @@ class BasePage:
 
             select = Select(element)
             select.select_by_value(option_value)
+            # Auto-dismiss overlays after successful selection
+            if self.auto_click_outside:
+                self.dismiss_overlays()
         except TimeoutException:
             logger.error(
                 f"Failed to select option by value within {timeout} seconds: {locator}"
@@ -377,3 +450,19 @@ class BasePage:
         except TimeoutException:
             logger.error(f"Alert not present within {timeout} seconds")
             raise
+
+    def enable_auto_click_outside(self):
+        """Enable automatic clicking outside form after each action."""
+        self.auto_click_outside = True
+        logger.info("🎯 Auto-click outside form ENABLED")
+    
+    def disable_auto_click_outside(self):
+        """Disable automatic clicking outside form after each action."""
+        self.auto_click_outside = False
+        logger.info("🎯 Auto-click outside form DISABLED")
+        
+    def set_auto_click_outside(self, enabled: bool):
+        """Set auto-click outside form behavior."""
+        self.auto_click_outside = enabled
+        status = "ENABLED" if enabled else "DISABLED"
+        logger.info(f"🎯 Auto-click outside form {status}")
