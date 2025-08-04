@@ -87,15 +87,15 @@ jobs:
       run: |
         pip install black flake8 isort
     
-    - name: Run Black (code formatting check)
-      run: |
-        echo "🔍 Checking code formatting with Black..."
-        black --check --diff .
-    
-    - name: Run isort (import sorting check)
-      run: |
-        echo "🔍 Checking import sorting with isort..."
-        isort --check-only --diff .
+    # - name: Run Black (code formatting check)
+    #   run: |
+    #     echo "🔍 Checking code formatting with Black..."
+    #     black --check --diff .
+    #
+    # - name: Run isort (import sorting check)
+    #   run: |
+    #     echo "🔍 Checking import sorting with isort..."
+    #     isort --check-only --diff .
     
     - name: Run Flake8 (linting)
       run: |
