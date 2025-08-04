@@ -2,9 +2,9 @@
 """
 Simple script to run tests locally.
 """
+import os
 import subprocess
 import sys
-import os
 
 
 def run_command(command, description):

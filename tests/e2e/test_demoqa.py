@@ -2,9 +2,11 @@
 E2E tests for DemoQA practice site.
 """
 
-import pytest
 import os
+
+import pytest
 from selenium.webdriver.common.by import By
+
 from pages.base_page import BasePage
 
 

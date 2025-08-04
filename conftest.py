@@ -2,23 +2,24 @@
 Pytest configuration and fixtures for the automation framework.
 """
 
+import logging
 import os
 import sys
-import pytest
-import logging
 from pathlib import Path
-from typing import Generator, Dict, Any
+from typing import Any, Dict, Generator
 from unittest.mock import Mock
+
+import pytest
 
 # Add project root to Python path
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
+from utils.api_client import APIClient
 # Import framework modules
 from utils.config_manager import ConfigManager
 from utils.logger import setup_logger
 from utils.webdriver_manager import WebDriverManager
-from utils.api_client import APIClient
 
 # Setup logging
 logger = setup_logger()
@@ -119,8 +120,8 @@ def test_environment():
 @pytest.fixture(scope="function")
 def wait_for_element(driver):
     """Provide explicit wait utility for web elements."""
-    from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.support.ui import WebDriverWait
 
     def wait(element_locator, timeout=20, condition=EC.presence_of_element_located):
         return WebDriverWait(driver, timeout).until(condition(element_locator))

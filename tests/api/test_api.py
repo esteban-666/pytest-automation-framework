@@ -2,9 +2,11 @@
 Comprehensive API tests for practice APIs.
 """
 
-import pytest
-import time
 import json
+import time
+
+import pytest
+
 from utils.api_client import APIClient
 
 

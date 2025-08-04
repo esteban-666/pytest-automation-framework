@@ -4,7 +4,8 @@ API client for making HTTP requests and API testing.
 
 import json
 import time
-from typing import Dict, Any, Optional, Union
+from typing import Any, Dict, Optional, Union
+
 import requests
 
 try:
@@ -15,6 +16,7 @@ except ImportError:
     HTTPX_AVAILABLE = False
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+
 from utils.logger import logger
 
 

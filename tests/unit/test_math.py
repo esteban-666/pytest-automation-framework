@@ -3,6 +3,7 @@ Unit tests for calculator functionality.
 """
 
 import pytest
+
 from utils.calculator import Calculator
 
 

@@ -2,12 +2,13 @@
 Logging utility for the automation framework.
 """
 
-import os
 import logging
+import os
 import sys
-from pathlib import Path
 from datetime import datetime
-from typing import Optional, Any
+from pathlib import Path
+from typing import Any, Optional
+
 from loguru import logger
 
 

@@ -2,9 +2,11 @@
 Comprehensive UI tests using Page Object Model for practice sites.
 """
 
-import pytest
 import os
 import time
+
+import pytest
+
 from pages.demoqa_pages import *
 from pages.the_internet_pages import *
 

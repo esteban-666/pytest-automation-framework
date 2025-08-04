@@ -2,11 +2,12 @@
 Configuration manager for the automation framework.
 """
 
-import os
-import yaml
 import json
+import os
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
+
+import yaml
 from dotenv import load_dotenv
 
 # Load environment variables from .env file

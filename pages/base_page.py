@@ -3,16 +3,16 @@ Base page object class with common web element interactions.
 """
 
 import time
-from typing import Optional, List, Tuple
+from typing import List, Optional, Tuple
+
+from selenium.common.exceptions import (ElementClickInterceptedException,
+                                        NoSuchElementException,
+                                        TimeoutException)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import (
-    TimeoutException,
-    NoSuchElementException,
-    ElementClickInterceptedException,
-)
+from selenium.webdriver.support.ui import WebDriverWait
+
 from utils.logger import logger
 
 
