@@ -9,9 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        test-type: [unit, api, e2e, comprehensive]
     env:
       # Increase memory and CPU for better E2E test performance
       PYTHONUNBUFFERED: 1
@@ -45,8 +42,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
-    - name: Set up Chrome (E2E tests only)
-      if: matrix.test-type == 'e2e' || matrix.test-type == 'comprehensive'
+    - name: Set up Chrome
       uses: nanasess/setup-chromedriver@v2
     
     - name: Create reports directory
@@ -59,21 +55,18 @@ jobs:
         echo "✅ Test collection verification completed"
     
     - name: Run unit tests with coverage
-      if: matrix.test-type == 'unit'
       run: |
         echo "🧪 Starting Unit Tests..."
         timeout 300 pytest tests/unit/ -v --cov=utils --cov-report=xml --cov-report=term-missing --cov-report=html:reports/coverage
         echo "✅ Unit tests completed"
     
     - name: Run API tests
-      if: matrix.test-type == 'api'
       run: |
         echo "🧪 Starting API Tests..."
         timeout 300 pytest tests/api/ -v --html=reports/api-report.html --self-contained-html
         echo "✅ API tests completed"
     
     - name: Run E2E tests with enhanced resources
-      if: matrix.test-type == 'e2e'
       run: |
         echo "🧪 Starting E2E Tests with enhanced resources..."
         echo "🔧 Chrome optimizations enabled"
@@ -88,7 +81,6 @@ jobs:
       timeout-minutes: 15
     
     - name: Run comprehensive tests with enhanced resources
-      if: matrix.test-type == 'comprehensive'
       run: |
         echo "🧪 Running comprehensive test suite with enhanced resources..."
         echo "🔧 Chrome optimizations enabled"
@@ -106,7 +98,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: test-reports-linear
+        name: test-reports
         path: |
           reports/
           .coverage
