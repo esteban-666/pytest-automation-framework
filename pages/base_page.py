@@ -23,9 +23,13 @@ class BasePage:
 
     def __init__(self, driver):
         """Initialize base page with webdriver."""
+        import os
         self.driver = driver
         self.wait = WebDriverWait(driver, 20)
-        self.auto_click_outside = True  # Enable auto-click outside by default
+        # Enable auto-click outside by default, but be less aggressive in CI
+        is_ci = os.getenv("CI") == "true" or os.getenv("GITHUB_ACTIONS") == "true"
+        self.auto_click_outside = True
+        self.ci_mode = is_ci
 
     def click_outside_form(self):
         """Click outside the form to dismiss any dropdowns or overlays."""
@@ -60,17 +64,25 @@ class BasePage:
     def dismiss_overlays(self):
         """Dismiss any interfering overlays or dropdowns."""
         try:
-            # Dismiss any active dropdowns by blurring active element
-            self.driver.execute_script("document.activeElement.blur();")
-            
-            # Press Escape key to close any modals/dropdowns
-            from selenium.webdriver.common.keys import Keys
-            from selenium.webdriver.common.action_chains import ActionChains
-            ActionChains(self.driver).send_keys(Keys.ESCAPE).perform()
-            
-            # Click outside if auto-click is enabled
-            if self.auto_click_outside:
-                self.click_outside_form()
+            # In CI mode, be more conservative to avoid hanging issues
+            if self.ci_mode:
+                # Only blur active element in CI - skip ESC key and click outside
+                self.driver.execute_script("document.activeElement.blur();")
+                import time
+                time.sleep(0.1)  # Brief pause for CI stability
+            else:
+                # Full overlay dismissal for local testing
+                # Dismiss any active dropdowns by blurring active element
+                self.driver.execute_script("document.activeElement.blur();")
+                
+                # Press Escape key to close any modals/dropdowns
+                from selenium.webdriver.common.keys import Keys
+                from selenium.webdriver.common.action_chains import ActionChains
+                ActionChains(self.driver).send_keys(Keys.ESCAPE).perform()
+                
+                # Click outside if auto-click is enabled
+                if self.auto_click_outside:
+                    self.click_outside_form()
                 
         except Exception as e:
             logger.debug(f"Could not dismiss overlays: {e}")

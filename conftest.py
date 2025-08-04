@@ -61,8 +61,9 @@ def driver(request) -> Generator:
     
     # Set different timeouts for CI vs local
     setup_timeout = 60 if is_ci else 30  # More time for CI setup
-    page_load_timeout = 20 if is_ci else 30  # Faster timeouts for CI
-    implicit_wait = 5 if is_ci else 10  # Faster implicit waits for CI
+    page_load_timeout = 15 if is_ci else 30  # Even faster timeouts for CI to prevent hanging
+    implicit_wait = 3 if is_ci else 10  # Very fast implicit waits for CI
+    script_timeout = 10 if is_ci else 20  # Conservative script timeout for CI
     
     # Set a timeout for WebDriver setup
     signal.signal(signal.SIGALRM, timeout_handler)
@@ -82,8 +83,8 @@ def driver(request) -> Generator:
         # Set page load timeout (shorter for CI)
         driver.set_page_load_timeout(page_load_timeout)
         
-        # Set script timeout (shorter for CI)
-        driver.set_script_timeout(page_load_timeout)
+        # Set script timeout (conservative for CI)
+        driver.set_script_timeout(script_timeout)
         
         print("✅ WebDriver initialized successfully")
         signal.alarm(0)  # Cancel the alarm
