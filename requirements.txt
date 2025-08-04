@@ -17,6 +17,7 @@ requests>=2.31.0
 # Data Handling
 PyYAML>=6.0
 python-dotenv>=1.0.0
+Faker>=18.0.0
 
 # Logging
 loguru>=0.7.0
