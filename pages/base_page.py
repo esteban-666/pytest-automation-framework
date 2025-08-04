@@ -47,14 +47,66 @@ class BasePage:
             raise
 
     def click_element(self, locator: Tuple[str, str], timeout: int = 20):
-        """Click element with explicit wait."""
+        """Enhanced click element with multiple fallback strategies."""
+        import time
+        from selenium.webdriver.common.action_chains import ActionChains
+        
+        # Method 1: Standard click with wait
         try:
             wait = WebDriverWait(self.driver, timeout)
             element = wait.until(EC.element_to_be_clickable(locator))
             element.click()
-        except (TimeoutException, ElementClickInterceptedException) as e:
+            return
+        except ElementClickInterceptedException:
+            logger.warning(f"Direct click failed: {locator}. Trying alternatives...")
+        except TimeoutException:
             logger.error(f"Failed to click element within {timeout} seconds: {locator}")
             raise
+            
+        # Method 2: JavaScript click
+        try:
+            element = self.find_element(locator, timeout=5)
+            self.driver.execute_script("arguments[0].click();", element)
+            logger.info("✅ JavaScript click successful")
+            return
+        except Exception:
+            logger.warning("JavaScript click failed, trying next method...")
+            
+        # Method 3: Action chains click
+        try:
+            element = self.find_element(locator, timeout=5)
+            ActionChains(self.driver).move_to_element(element).click().perform()
+            logger.info("✅ Action chains click successful")
+            return
+        except Exception:
+            logger.warning("Action chains click failed, trying next method...")
+            
+        # Method 4: Scroll into view and click
+        try:
+            element = self.find_element(locator, timeout=5)
+            self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
+            time.sleep(0.5)  # Allow scroll to complete
+            element.click()
+            logger.info("✅ Scroll + click successful")
+            return
+        except Exception:
+            logger.warning("Scroll + click failed, trying final method...")
+            
+        # Method 5: Force click at coordinates
+        try:
+            element = self.find_element(locator, timeout=5)
+            location = element.location_once_scrolled_into_view
+            size = element.size
+            x = location['x'] + size['width'] // 2
+            y = location['y'] + size['height'] // 2
+            self.driver.execute_script(
+                f"document.elementFromPoint({x}, {y}).click();"
+            )
+            logger.info("✅ Coordinate click successful")
+            return
+        except Exception as e:
+            logger.error(f"All click methods failed for {locator}: {e}")
+            raise ElementClickInterceptedException(f"All click methods failed for {locator}")
 
     def type_text(self, locator: Tuple[str, str], text: str, timeout: int = 20):
         """Type text into element with explicit wait."""

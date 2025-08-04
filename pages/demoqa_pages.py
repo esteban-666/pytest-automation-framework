@@ -152,19 +152,21 @@ class DemoQAFormsPage(BasePage):
 class DemoQAPracticeFormPage(BasePage):
     """Practice Form page object for DemoQA."""
 
-    # Locators - using proper CSS selectors
+    # Locators - using robust selectors that work with modern UI
     FIRST_NAME_INPUT = (By.CSS_SELECTOR, "#firstName")
     LAST_NAME_INPUT = (By.CSS_SELECTOR, "#lastName")
     EMAIL_INPUT = (By.CSS_SELECTOR, "#userEmail")
-    GENDER_MALE_RADIO = (By.CSS_SELECTOR, "input[value='Male']")
-    GENDER_FEMALE_RADIO = (By.CSS_SELECTOR, "input[value='Female']")
-    GENDER_OTHER_RADIO = (By.CSS_SELECTOR, "input[value='Other']")
+    # Use label selectors for better reliability with custom radio buttons
+    GENDER_MALE_RADIO = (By.CSS_SELECTOR, "label[for='gender-radio-1']")
+    GENDER_FEMALE_RADIO = (By.CSS_SELECTOR, "label[for='gender-radio-2']") 
+    GENDER_OTHER_RADIO = (By.CSS_SELECTOR, "label[for='gender-radio-3']")
     MOBILE_INPUT = (By.CSS_SELECTOR, "#userNumber")
     DATE_OF_BIRTH_INPUT = (By.CSS_SELECTOR, "#dateOfBirthInput")
     SUBJECTS_INPUT = (By.CSS_SELECTOR, "#subjectsInput")
-    HOBBIES_SPORTS_CHECKBOX = (By.CSS_SELECTOR, "input[value='Sports']")
-    HOBBIES_READING_CHECKBOX = (By.CSS_SELECTOR, "input[value='Reading']")
-    HOBBIES_MUSIC_CHECKBOX = (By.CSS_SELECTOR, "input[value='Music']")
+    # Use label selectors for checkboxes to avoid click interception
+    HOBBIES_SPORTS_CHECKBOX = (By.CSS_SELECTOR, "label[for='hobbies-checkbox-1']")
+    HOBBIES_READING_CHECKBOX = (By.CSS_SELECTOR, "label[for='hobbies-checkbox-2']")
+    HOBBIES_MUSIC_CHECKBOX = (By.CSS_SELECTOR, "label[for='hobbies-checkbox-3']")
     UPLOAD_PICTURE_INPUT = (By.CSS_SELECTOR, "#uploadPicture")
     CURRENT_ADDRESS_INPUT = (By.CSS_SELECTOR, "#currentAddress")
     STATE_DROPDOWN = (By.CSS_SELECTOR, "#state")
@@ -191,7 +193,17 @@ class DemoQAPracticeFormPage(BasePage):
         self.type_text(self.MOBILE_INPUT, mobile, timeout=20)
 
     def select_hobbies(self, hobbies):
-        """Select hobbies."""
+        """Select hobbies with enhanced handling for overlapping elements."""
+        import time
+        
+        # First, dismiss any open dropdowns that might interfere
+        try:
+            # Click elsewhere to close any open dropdowns
+            self.driver.execute_script("document.activeElement.blur();")
+            time.sleep(0.3)
+        except:
+            pass
+            
         if "Sports" in hobbies:
             self.click_element(self.HOBBIES_SPORTS_CHECKBOX, timeout=20)
         if "Reading" in hobbies:
