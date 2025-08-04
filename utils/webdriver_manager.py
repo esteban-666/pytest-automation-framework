@@ -93,7 +93,10 @@ class WebDriverManager:
         if headless:
             options.add_argument("--headless")
 
-        # Common Chrome options
+        # Check if performance optimizations are enabled
+        enable_performance_optimizations = self.config.get("browser.performance_optimizations", True)
+
+        # Enhanced Chrome options for better performance
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-gpu")
@@ -104,6 +107,34 @@ class WebDriverManager:
         options.add_argument("--disable-web-security")
         options.add_argument("--allow-running-insecure-content")
         options.add_argument("--disable-blink-features=AutomationControlled")
+        
+        # Memory and performance optimizations (only if enabled)
+        if enable_performance_optimizations:
+            logger.info("🚀 Performance optimizations enabled for Chrome")
+            options.add_argument("--memory-pressure-off")
+            options.add_argument("--max_old_space_size=4096")
+            options.add_argument("--disable-background-timer-throttling")
+            options.add_argument("--disable-backgrounding-occluded-windows")
+            options.add_argument("--disable-renderer-backgrounding")
+            options.add_argument("--disable-features=TranslateUI")
+            options.add_argument("--disable-ipc-flooding-protection")
+            options.add_argument("--disable-hang-monitor")
+            options.add_argument("--disable-prompt-on-repost")
+            options.add_argument("--disable-domain-reliability")
+            options.add_argument("--disable-component-extensions-with-background-pages")
+            options.add_argument("--disable-default-apps")
+            options.add_argument("--disable-sync")
+            options.add_argument("--disable-translate")
+            options.add_argument("--disable-background-networking")
+            options.add_argument("--disable-client-side-phishing-detection")
+            options.add_argument("--disable-component-update")
+            options.add_argument("--disable-extensions-file-access-check")
+            options.add_argument("--disable-extensions-http-throttling")
+            options.add_argument("--disable-features=VizDisplayCompositor")
+        else:
+            logger.info("⚡ Performance optimizations disabled for Chrome")
+        
+        # Automation detection prevention
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option("useAutomationExtension", False)
 

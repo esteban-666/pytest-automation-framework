@@ -20,6 +20,9 @@ browser:
   headless: false
   download_path: "./downloads"
   user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+  performance_optimizations: true
+  memory_limit: 4096
+  cpu_optimization: true
 
 reporting:
   html_report: true
