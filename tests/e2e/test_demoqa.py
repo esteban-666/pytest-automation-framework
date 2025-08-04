@@ -383,8 +383,8 @@ class TestDemoQA:
             self.log_step(
                 "STEP 1", "Navigate to alerts and windows page", "Alerts page loads"
             )
-            print("   🌐 Navigating to https://demoqa.com/alertsWindows")
-            self.driver.get("https://demoqa.com/alertsWindows")
+            print("   🌐 Navigating to https://demoqa.com/alerts")
+            self.driver.get("https://demoqa.com/alerts")
             print("   ✅ Alerts page loaded")
 
             # ===== STEP 2: TEST SIMPLE ALERT =====
