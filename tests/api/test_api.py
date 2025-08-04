@@ -1,6 +1,7 @@
 """
 Comprehensive API tests for practice APIs.
 """
+
 import pytest
 import time
 import json
@@ -14,7 +15,9 @@ class TestAPI:
     def setup_api_clients(self):
         """Setup API clients for different services."""
         print("\n🔧 Setting up API clients for different services...")
-        self.jsonplaceholder_client = APIClient(base_url="https://jsonplaceholder.typicode.com")
+        self.jsonplaceholder_client = APIClient(
+            base_url="https://jsonplaceholder.typicode.com"
+        )
         self.reqres_client = APIClient(base_url="https://reqres.in/api")
         self.httpbin_client = APIClient(base_url="https://httpbin.org")
         self.pokemon_client = APIClient(base_url="https://pokeapi.co/api/v2")
@@ -39,29 +42,33 @@ class TestAPI:
         """
         Test JSONPlaceholder CRUD operations (Create, Read, Update, Delete)
         """
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("🧪 TEST: JSONPlaceholder CRUD Workflow")
-        print("="*80)
-        
+        print("=" * 80)
+
         # ===== STEP 1: CREATE (POST) =====
         print("\n📝 STEP 1: Creating a new post using POST method")
         print("   Purpose: Test resource creation with JSONPlaceholder API")
         print("   Expected: Status 201 (Created) with post data returned")
-        
+
         post_data = {
             "title": "Comprehensive Test Post",
             "body": "This is a comprehensive test post for CRUD operations",
-            "userId": 1
+            "userId": 1,
         }
         print(f"   Request Data: {json.dumps(post_data, indent=2)}")
 
-        create_response = self.jsonplaceholder_client.post("/posts", json_data=post_data)
+        create_response = self.jsonplaceholder_client.post(
+            "/posts", json_data=post_data
+        )
         self.log_response("CREATE Response", create_response, post_data)
-        
+
         # Validate response
-        assert create_response.status_code == 201, f"Expected 201, got {create_response.status_code}"
+        assert (
+            create_response.status_code == 201
+        ), f"Expected 201, got {create_response.status_code}"
         created_post = create_response.json()
-        
+
         # Validate created post structure
         print("\n   ✅ Validating created post structure...")
         assert created_post["title"] == post_data["title"], "Title mismatch"
@@ -76,13 +83,17 @@ class TestAPI:
         print("\n📖 STEP 2: Reading an existing post using GET method")
         print("   Purpose: Test resource retrieval (reading post with ID 1)")
         print("   Expected: Status 200 (OK) with post data")
-        print("   Note: JSONPlaceholder doesn't actually create resources, so we read an existing one")
+        print(
+            "   Note: JSONPlaceholder doesn't actually create resources, so we read an existing one"
+        )
 
         read_response = self.jsonplaceholder_client.get("/posts/1")
         self.log_response("READ Response", read_response)
-        
+
         # Validate response
-        assert read_response.status_code == 200, f"Expected 200, got {read_response.status_code}"
+        assert (
+            read_response.status_code == 200
+        ), f"Expected 200, got {read_response.status_code}"
         existing_post = read_response.json()
 
         # Validate post structure
@@ -103,15 +114,19 @@ class TestAPI:
             "id": post_id,
             "title": "Updated Test Post",
             "body": "This is an updated test post",
-            "userId": 1
+            "userId": 1,
         }
         print(f"   Update Data: {json.dumps(update_data, indent=2)}")
 
-        update_response = self.jsonplaceholder_client.put(f"/posts/{post_id}", json_data=update_data)
+        update_response = self.jsonplaceholder_client.put(
+            f"/posts/{post_id}", json_data=update_data
+        )
         self.log_response("UPDATE Response", update_response, update_data)
-        
+
         # Validate response
-        assert update_response.status_code == 200, f"Expected 200, got {update_response.status_code}"
+        assert (
+            update_response.status_code == 200
+        ), f"Expected 200, got {update_response.status_code}"
         updated_post = update_response.json()
 
         # Validate updated post
@@ -123,54 +138,61 @@ class TestAPI:
         # ===== STEP 4: DELETE =====
         print("\n🗑️ STEP 4: Deleting the post using DELETE method")
         print("   Purpose: Test resource deletion")
-        print("   Expected: Status 200 (OK) - JSONPlaceholder always returns 200 for delete")
+        print(
+            "   Expected: Status 200 (OK) - JSONPlaceholder always returns 200 for delete"
+        )
         print(f"   Target Post ID: {post_id}")
 
         delete_response = self.jsonplaceholder_client.delete(f"/posts/{post_id}")
         self.log_response("DELETE Response", delete_response)
-        
+
         # Validate response
-        assert delete_response.status_code == 200, f"Expected 200, got {delete_response.status_code}"
+        assert (
+            delete_response.status_code == 200
+        ), f"Expected 200, got {delete_response.status_code}"
         print("   ✅ Delete operation completed (JSONPlaceholder mock behavior)")
 
         # ===== STEP 5: VERIFICATION =====
         print("\n🔍 STEP 5: Verification")
         print("   Purpose: Verify that JSONPlaceholder behaves as expected (mock API)")
-        print("   Note: JSONPlaceholder doesn't actually delete resources, it's a mock API")
+        print(
+            "   Note: JSONPlaceholder doesn't actually delete resources, it's a mock API"
+        )
         print("   ✅ CRUD workflow test completed successfully!")
 
     def testReqresAuthAndUserManagement(self):
         """
         Test ReqRes authentication and user management operations
         """
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("🧪 TEST: ReqRes Authentication and User Management")
-        print("="*80)
-        
+        print("=" * 80)
+
         # ===== STEP 1: USER LOGIN =====
         print("\n🔐 STEP 1: User authentication using POST method")
         print("   Purpose: Test user login with ReqRes API")
         print("   Expected: Status 200 (OK) with authentication token")
         print("   Note: Using known good credentials for testing")
 
-        login_data = {
-            "email": "eve.holt@reqres.in",
-            "password": "cityslicka"
-        }
+        login_data = {"email": "eve.holt@reqres.in", "password": "cityslicka"}
         print(f"   Login Data: {json.dumps(login_data, indent=2)}")
 
         login_response = self.reqres_client.post("/login", json_data=login_data)
         self.log_response("LOGIN Response", login_response, login_data)
-        
+
         # Validate response
-        assert login_response.status_code == 200, f"Expected 200, got {login_response.status_code}"
+        assert (
+            login_response.status_code == 200
+        ), f"Expected 200, got {login_response.status_code}"
         login_result = login_response.json()
 
         # Validate login response
         print("\n   ✅ Validating login response...")
         assert "token" in login_result, "Authentication token missing"
         assert len(login_result["token"]) > 0, "Authentication token is empty"
-        print(f"   ✅ Login successful! Token received: {login_result['token'][:20]}...")
+        print(
+            f"   ✅ Login successful! Token received: {login_result['token'][:20]}..."
+        )
 
         # ===== STEP 2: GET USER LIST =====
         print("\n👥 STEP 2: Retrieving user list using GET method")
@@ -179,9 +201,11 @@ class TestAPI:
 
         users_response = self.reqres_client.get("/users")
         self.log_response("USERS LIST Response", users_response)
-        
+
         # Validate response
-        assert users_response.status_code == 200, f"Expected 200, got {users_response.status_code}"
+        assert (
+            users_response.status_code == 200
+        ), f"Expected 200, got {users_response.status_code}"
         users_data = users_response.json()
 
         # Validate users response structure
@@ -190,7 +214,9 @@ class TestAPI:
         assert "page" in users_data, "Page information missing"
         assert "per_page" in users_data, "Per page information missing"
         assert "total" in users_data, "Total count missing"
-        print(f"   ✅ Users list retrieved: {len(users_data['data'])} users on page {users_data['page']}")
+        print(
+            f"   ✅ Users list retrieved: {len(users_data['data'])} users on page {users_data['page']}"
+        )
 
         # ===== STEP 3: GET SPECIFIC USER =====
         print("\n👤 STEP 3: Retrieving specific user using GET method")
@@ -200,12 +226,14 @@ class TestAPI:
         if users_data["data"]:
             user_id = users_data["data"][0]["id"]
             print(f"   Target User ID: {user_id}")
-            
+
             user_response = self.reqres_client.get(f"/users/{user_id}")
             self.log_response("SPECIFIC USER Response", user_response)
-            
+
             # Validate response
-            assert user_response.status_code == 200, f"Expected 200, got {user_response.status_code}"
+            assert (
+                user_response.status_code == 200
+            ), f"Expected 200, got {user_response.status_code}"
             user_data = user_response.json()
 
             # Validate user data structure
@@ -215,7 +243,9 @@ class TestAPI:
             assert "email" in user_data["data"], "User email missing"
             assert "first_name" in user_data["data"], "User first name missing"
             assert "last_name" in user_data["data"], "User last name missing"
-            print(f"   ✅ User details retrieved: {user_data['data']['first_name']} {user_data['data']['last_name']}")
+            print(
+                f"   ✅ User details retrieved: {user_data['data']['first_name']} {user_data['data']['last_name']}"
+            )
         else:
             print("   ⚠️ No users available for specific user test")
 
@@ -224,35 +254,40 @@ class TestAPI:
         print("   Purpose: Test user creation")
         print("   Expected: Status 201 (Created) with new user data")
 
-        new_user_data = {
-            "name": "Test User",
-            "job": "QA Engineer"
-        }
+        new_user_data = {"name": "Test User", "job": "QA Engineer"}
         print(f"   New User Data: {json.dumps(new_user_data, indent=2)}")
 
-        create_user_response = self.reqres_client.post("/users", json_data=new_user_data)
+        create_user_response = self.reqres_client.post(
+            "/users", json_data=new_user_data
+        )
         self.log_response("CREATE USER Response", create_user_response, new_user_data)
-        
+
         # Validate response
-        assert create_user_response.status_code == 201, f"Expected 201, got {create_user_response.status_code}"
+        assert (
+            create_user_response.status_code == 201
+        ), f"Expected 201, got {create_user_response.status_code}"
         created_user = create_user_response.json()
 
         # Validate created user
         print("\n   ✅ Validating created user...")
-        assert created_user["name"] == new_user_data["name"], "Created user name mismatch"
+        assert (
+            created_user["name"] == new_user_data["name"]
+        ), "Created user name mismatch"
         assert created_user["job"] == new_user_data["job"], "Created user job mismatch"
         assert "id" in created_user, "Created user ID missing"
         assert "createdAt" in created_user, "Created user timestamp missing"
-        print(f"   ✅ User created successfully: {created_user['name']} (ID: {created_user['id']})")
+        print(
+            f"   ✅ User created successfully: {created_user['name']} (ID: {created_user['id']})"
+        )
 
     def testJsonplaceholderDataValidation(self):
         """
         Test JSONPlaceholder data validation and error handling
         """
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("🧪 TEST: JSONPlaceholder Data Validation and Error Handling")
-        print("="*80)
-        
+        print("=" * 80)
+
         # ===== STEP 1: VALID POST RETRIEVAL =====
         print("\n✅ STEP 1: Testing valid post retrieval")
         print("   Purpose: Validate successful GET request with proper data structure")
@@ -260,11 +295,13 @@ class TestAPI:
 
         valid_post_response = self.jsonplaceholder_client.get("/posts/1")
         self.log_response("VALID POST Response", valid_post_response)
-        
+
         # Validate response
-        assert valid_post_response.status_code == 200, f"Expected 200, got {valid_post_response.status_code}"
+        assert (
+            valid_post_response.status_code == 200
+        ), f"Expected 200, got {valid_post_response.status_code}"
         post_data = valid_post_response.json()
-        
+
         # Manual validation since jsonschema might not be available
         print("\n   ✅ Validating post data structure...")
         assert isinstance(post_data, dict), "Post should be a dictionary"
@@ -287,15 +324,19 @@ class TestAPI:
 
         posts_response = self.jsonplaceholder_client.get("/posts", params=query_params)
         self.log_response("QUERY PARAMS Response", posts_response)
-        
+
         # Validate response
-        assert posts_response.status_code == 200, f"Expected 200, got {posts_response.status_code}"
+        assert (
+            posts_response.status_code == 200
+        ), f"Expected 200, got {posts_response.status_code}"
         posts_data = posts_response.json()
 
         # Validate posts response
         print("\n   ✅ Validating query parameters response...")
         assert isinstance(posts_data, list), "Posts should be a list"
-        assert len(posts_data) <= 3, "Should have at most 3 posts due to _limit parameter"
+        assert (
+            len(posts_data) <= 3
+        ), "Should have at most 3 posts due to _limit parameter"
         print(f"   ✅ Query parameters test passed: {len(posts_data)} posts retrieved")
 
         # ===== STEP 3: ERROR HANDLING =====
@@ -305,9 +346,11 @@ class TestAPI:
 
         error_response = self.jsonplaceholder_client.get("/posts/999999")
         self.log_response("ERROR Response", error_response)
-        
+
         # Validate response
-        assert error_response.status_code == 404, f"Expected 404, got {error_response.status_code}"
+        assert (
+            error_response.status_code == 404
+        ), f"Expected 404, got {error_response.status_code}"
         print("   ✅ Error handling test passed: 404 received for non-existent post")
 
         # ===== STEP 4: COMMENTS RETRIEVAL =====
@@ -317,9 +360,11 @@ class TestAPI:
 
         comments_response = self.jsonplaceholder_client.get("/posts/1/comments")
         self.log_response("COMMENTS Response", comments_response)
-        
+
         # Validate response
-        assert comments_response.status_code == 200, f"Expected 200, got {comments_response.status_code}"
+        assert (
+            comments_response.status_code == 200
+        ), f"Expected 200, got {comments_response.status_code}"
         comments_data = comments_response.json()
 
         # Validate comments structure
@@ -332,7 +377,9 @@ class TestAPI:
             assert "name" in comment, "Comment should have a name"
             assert "email" in comment, "Comment should have an email"
             assert "body" in comment, "Comment should have a body"
-            print(f"   ✅ Comments test passed: {len(comments_data)} comments retrieved")
+            print(
+                f"   ✅ Comments test passed: {len(comments_data)} comments retrieved"
+            )
         else:
             print("   ⚠️ No comments found for the post")
 
@@ -348,22 +395,28 @@ class TestAPI:
         # Validate response timing
         response_time = end_time - start_time
         print(f"   Response Time: {response_time:.2f} seconds")
-        assert response_time < 5.0, f"Response time {response_time:.2f}s should be under 5 seconds"
+        assert (
+            response_time < 5.0
+        ), f"Response time {response_time:.2f}s should be under 5 seconds"
 
         # Validate response headers
         print("\n   ✅ Validating response headers...")
-        assert "content-type" in response.headers, "Response should have content-type header"
-        assert "application/json" in response.headers["content-type"], "Content type should be JSON"
+        assert (
+            "content-type" in response.headers
+        ), "Response should have content-type header"
+        assert (
+            "application/json" in response.headers["content-type"]
+        ), "Content type should be JSON"
         print(f"   ✅ Headers validation passed: {response.headers['content-type']}")
 
     def testAllRestMethods(self):
         """
         Test all REST methods (GET, POST, PUT, PATCH, DELETE) using different APIs
         """
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("🧪 TEST: All REST Methods Demonstration")
-        print("="*80)
-        
+        print("=" * 80)
+
         # ===== GET METHOD =====
         print("\n📥 STEP 1: GET Method - Pokemon API")
         print("   Purpose: Demonstrate GET request with Pokemon API")
@@ -371,11 +424,13 @@ class TestAPI:
 
         pokemon_response = self.pokemon_client.get("/pokemon/pikachu")
         self.log_response("GET Pokemon Response", pokemon_response)
-        
+
         # Validate response
-        assert pokemon_response.status_code == 200, f"Expected 200, got {pokemon_response.status_code}"
+        assert (
+            pokemon_response.status_code == 200
+        ), f"Expected 200, got {pokemon_response.status_code}"
         pokemon_data = pokemon_response.json()
-        
+
         # Validate Pokemon data
         print("\n   ✅ Validating Pokemon data...")
         assert pokemon_data["name"] == "pikachu", "Pokemon name mismatch"
@@ -383,7 +438,9 @@ class TestAPI:
         assert "height" in pokemon_data, "Pokemon height missing"
         assert "weight" in pokemon_data, "Pokemon weight missing"
         assert "abilities" in pokemon_data, "Pokemon abilities missing"
-        print(f"   ✅ Pokemon data retrieved: {pokemon_data['name']} (ID: {pokemon_data['id']})")
+        print(
+            f"   ✅ Pokemon data retrieved: {pokemon_data['name']} (ID: {pokemon_data['id']})"
+        )
 
         # ===== POST METHOD =====
         print("\n📤 STEP 2: POST Method - HTTPBin")
@@ -393,21 +450,27 @@ class TestAPI:
         post_data = {
             "test": "POST method",
             "framework": "pytest",
-            "timestamp": time.time()
+            "timestamp": time.time(),
         }
         print(f"   POST Data: {json.dumps(post_data, indent=2)}")
-        
+
         post_response = self.httpbin_client.post("/post", json_data=post_data)
         self.log_response("POST Response", post_response, post_data)
-        
+
         # Validate response
-        assert post_response.status_code == 200, f"Expected 200, got {post_response.status_code}"
+        assert (
+            post_response.status_code == 200
+        ), f"Expected 200, got {post_response.status_code}"
         post_result = post_response.json()
-        
+
         # Validate POST response
         print("\n   ✅ Validating POST response...")
-        assert post_result["json"]["test"] == post_data["test"], "POST test field mismatch"
-        assert post_result["json"]["framework"] == post_data["framework"], "POST framework field mismatch"
+        assert (
+            post_result["json"]["test"] == post_data["test"]
+        ), "POST test field mismatch"
+        assert (
+            post_result["json"]["framework"] == post_data["framework"]
+        ), "POST framework field mismatch"
         assert "origin" in post_result, "POST origin missing"
         assert "url" in post_result, "POST url missing"
         print("   ✅ POST method test passed")
@@ -417,24 +480,24 @@ class TestAPI:
         print("   Purpose: Demonstrate PUT request (complete resource update)")
         print("   Expected: Status 200 (OK) with echoed data")
 
-        put_data = {
-            "test": "PUT method",
-            "action": "update",
-            "timestamp": time.time()
-        }
+        put_data = {"test": "PUT method", "action": "update", "timestamp": time.time()}
         print(f"   PUT Data: {json.dumps(put_data, indent=2)}")
-        
+
         put_response = self.httpbin_client.put("/put", json_data=put_data)
         self.log_response("PUT Response", put_response, put_data)
-        
+
         # Validate response
-        assert put_response.status_code == 200, f"Expected 200, got {put_response.status_code}"
+        assert (
+            put_response.status_code == 200
+        ), f"Expected 200, got {put_response.status_code}"
         put_result = put_response.json()
-        
+
         # Validate PUT response
         print("\n   ✅ Validating PUT response...")
         assert put_result["json"]["test"] == put_data["test"], "PUT test field mismatch"
-        assert put_result["json"]["action"] == put_data["action"], "PUT action field mismatch"
+        assert (
+            put_result["json"]["action"] == put_data["action"]
+        ), "PUT action field mismatch"
         print("   ✅ PUT method test passed")
 
         # ===== PATCH METHOD =====
@@ -445,21 +508,27 @@ class TestAPI:
         patch_data = {
             "test": "PATCH method",
             "action": "partial_update",
-            "timestamp": time.time()
+            "timestamp": time.time(),
         }
         print(f"   PATCH Data: {json.dumps(patch_data, indent=2)}")
-        
+
         patch_response = self.httpbin_client.patch("/patch", json_data=patch_data)
         self.log_response("PATCH Response", patch_response, patch_data)
-        
+
         # Validate response
-        assert patch_response.status_code == 200, f"Expected 200, got {patch_response.status_code}"
+        assert (
+            patch_response.status_code == 200
+        ), f"Expected 200, got {patch_response.status_code}"
         patch_result = patch_response.json()
-        
+
         # Validate PATCH response
         print("\n   ✅ Validating PATCH response...")
-        assert patch_result["json"]["test"] == patch_data["test"], "PATCH test field mismatch"
-        assert patch_result["json"]["action"] == patch_data["action"], "PATCH action field mismatch"
+        assert (
+            patch_result["json"]["test"] == patch_data["test"]
+        ), "PATCH test field mismatch"
+        assert (
+            patch_result["json"]["action"] == patch_data["action"]
+        ), "PATCH action field mismatch"
         print("   ✅ PATCH method test passed")
 
         # ===== DELETE METHOD =====
@@ -469,16 +538,20 @@ class TestAPI:
 
         delete_response = self.httpbin_client.delete("/delete")
         self.log_response("DELETE Response", delete_response)
-        
+
         # Validate response
-        assert delete_response.status_code == 200, f"Expected 200, got {delete_response.status_code}"
+        assert (
+            delete_response.status_code == 200
+        ), f"Expected 200, got {delete_response.status_code}"
         delete_result = delete_response.json()
-        
+
         # Validate DELETE response
         print("\n   ✅ Validating DELETE response...")
         assert "origin" in delete_result, "DELETE origin missing"
         assert "url" in delete_result, "DELETE url missing"
-        assert delete_result["url"] == "https://httpbin.org/delete", "DELETE url mismatch"
+        assert (
+            delete_result["url"] == "https://httpbin.org/delete"
+        ), "DELETE url mismatch"
         print("   ✅ DELETE method test passed")
 
         # ===== ADDITIONAL GET WITH QUERY PARAMETERS =====
@@ -488,18 +561,24 @@ class TestAPI:
 
         query_params = {"param1": "value1", "param2": "value2"}
         print(f"   Query Parameters: {json.dumps(query_params, indent=2)}")
-        
+
         get_with_params_response = self.httpbin_client.get("/get", params=query_params)
         self.log_response("GET with Params Response", get_with_params_response)
-        
+
         # Validate response
-        assert get_with_params_response.status_code == 200, f"Expected 200, got {get_with_params_response.status_code}"
+        assert (
+            get_with_params_response.status_code == 200
+        ), f"Expected 200, got {get_with_params_response.status_code}"
         get_with_params_result = get_with_params_response.json()
-        
+
         # Validate query parameters
         print("\n   ✅ Validating query parameters...")
-        assert get_with_params_result["args"]["param1"] == "value1", "Query param1 mismatch"
-        assert get_with_params_result["args"]["param2"] == "value2", "Query param2 mismatch"
+        assert (
+            get_with_params_result["args"]["param1"] == "value1"
+        ), "Query param1 mismatch"
+        assert (
+            get_with_params_result["args"]["param2"] == "value2"
+        ), "Query param2 mismatch"
         print("   ✅ Query parameters test passed")
 
         # ===== TEST HEADERS =====
@@ -507,19 +586,26 @@ class TestAPI:
         print("   Purpose: Demonstrate request with custom headers")
         print("   Expected: Status 200 (OK) with headers echoed back")
 
-        custom_headers = {"X-Custom-Header": "pytest-framework", "User-Agent": "pytest-automation"}
+        custom_headers = {
+            "X-Custom-Header": "pytest-framework",
+            "User-Agent": "pytest-automation",
+        }
         print(f"   Custom Headers: {json.dumps(custom_headers, indent=2)}")
-        
+
         headers_response = self.httpbin_client.get("/headers", headers=custom_headers)
         self.log_response("Headers Response", headers_response)
-        
+
         # Validate response
-        assert headers_response.status_code == 200, f"Expected 200, got {headers_response.status_code}"
+        assert (
+            headers_response.status_code == 200
+        ), f"Expected 200, got {headers_response.status_code}"
         headers_result = headers_response.json()
-        
+
         # Validate custom headers
         print("\n   ✅ Validating custom headers...")
-        assert headers_result["headers"]["X-Custom-Header"] == "pytest-framework", "Custom header mismatch"
+        assert (
+            headers_result["headers"]["X-Custom-Header"] == "pytest-framework"
+        ), "Custom header mismatch"
         print("   ✅ Custom headers test passed")
-        
-        print("\n🎉 All REST methods demonstration completed successfully!") 
+
+        print("\n🎉 All REST methods demonstration completed successfully!")

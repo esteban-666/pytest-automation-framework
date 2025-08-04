@@ -1,26 +1,32 @@
 """
 Setup script for pytest automation framework.
 """
+
 from setuptools import setup, find_packages
 import os
+
 
 # Read the README file
 def read_readme():
     """Read README.md file."""
-    readme_path = os.path.join(os.path.dirname(__file__), 'README.md')
+    readme_path = os.path.join(os.path.dirname(__file__), "README.md")
     if os.path.exists(readme_path):
-        with open(readme_path, 'r', encoding='utf-8') as f:
+        with open(readme_path, "r", encoding="utf-8") as f:
             return f.read()
     return "Pytest Automation Framework"
+
 
 # Read requirements
 def read_requirements():
     """Read requirements.txt file."""
-    requirements_path = os.path.join(os.path.dirname(__file__), 'requirements.txt')
+    requirements_path = os.path.join(os.path.dirname(__file__), "requirements.txt")
     if os.path.exists(requirements_path):
-        with open(requirements_path, 'r', encoding='utf-8') as f:
-            return [line.strip() for line in f if line.strip() and not line.startswith('#')]
+        with open(requirements_path, "r", encoding="utf-8") as f:
+            return [
+                line.strip() for line in f if line.strip() and not line.startswith("#")
+            ]
     return []
+
 
 setup(
     name="pytest-automation-framework",
