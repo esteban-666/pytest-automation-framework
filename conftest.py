@@ -16,6 +16,7 @@ project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
 from utils.api_client import APIClient
+
 # Import framework modules
 from utils.config_manager import ConfigManager
 from utils.logger import setup_logger
@@ -49,19 +50,55 @@ def web_base_url(test_config) -> str:
 @pytest.fixture(scope="function")
 def driver(request) -> Generator:
     """Provide WebDriver instance for web tests."""
-    driver_manager = WebDriverManager()
-    driver = driver_manager.get_driver()
+    import signal
+    from selenium.common.exceptions import WebDriverException
+    
+    def timeout_handler(signum, frame):
+        raise TimeoutError("WebDriver setup timed out")
+    
+    # Set a timeout for WebDriver setup
+    signal.signal(signal.SIGALRM, timeout_handler)
+    signal.alarm(30)  # 30 second timeout
+    
+    try:
+        print("🔧 Initializing WebDriver...")
+        driver_manager = WebDriverManager()
+        driver = driver_manager.get_driver()
 
-    # Set implicit wait
-    driver.implicitly_wait(10)
+        # Set implicit wait
+        driver.implicitly_wait(10)
 
-    # Set window size
-    driver.set_window_size(1920, 1080)
+        # Set window size
+        driver.set_window_size(1920, 1080)
+        
+        # Set page load timeout
+        driver.set_page_load_timeout(30)
+        
+        # Set script timeout
+        driver.set_script_timeout(30)
+        
+        print("✅ WebDriver initialized successfully")
+        signal.alarm(0)  # Cancel the alarm
+        
+        yield driver
 
-    yield driver
-
-    # Cleanup
-    driver.quit()
+    except (WebDriverException, TimeoutError) as e:
+        signal.alarm(0)  # Cancel the alarm
+        print(f"❌ WebDriver initialization failed: {e}")
+        raise
+    except Exception as e:
+        signal.alarm(0)  # Cancel the alarm
+        print(f"❌ Unexpected error during WebDriver setup: {e}")
+        raise
+    finally:
+        signal.alarm(0)  # Ensure alarm is cancelled
+        try:
+            if 'driver' in locals():
+                print("🧹 Cleaning up WebDriver...")
+                driver.quit()
+                print("✅ WebDriver cleanup completed")
+        except Exception as e:
+            print(f"⚠️ Warning: WebDriver cleanup failed: {e}")
 
 
 @pytest.fixture(scope="function")
@@ -165,34 +202,21 @@ def generate_test_data():
 
 # Pytest hooks
 def pytest_configure(config):
-    """Configure pytest with custom markers and metadata."""
+    """Configure pytest with custom markers and settings."""
     # Add custom markers
-    config.addinivalue_line("markers", "smoke: marks tests as smoke tests")
-    config.addinivalue_line("markers", "regression: marks tests as regression tests")
-    config.addinivalue_line("markers", "e2e: marks tests as end-to-end tests")
+    config.addinivalue_line("markers", "slow: marks tests as slow (deselect with '-m \"not slow\"')")
+    config.addinivalue_line("markers", "critical: marks tests as critical")
     config.addinivalue_line("markers", "api: marks tests as API tests")
-    config.addinivalue_line("markers", "unit: marks tests as unit tests")
-    config.addinivalue_line("markers", "integration: marks tests as integration tests")
-    config.addinivalue_line("markers", "slow: marks tests as slow running")
-    config.addinivalue_line("markers", "flaky: marks tests as potentially flaky")
-    config.addinivalue_line(
-        "markers", "critical: marks tests as critical functionality"
-    )
-    config.addinivalue_line("markers", "performance: marks tests as performance tests")
-    config.addinivalue_line("markers", "security: marks tests as security tests")
-    config.addinivalue_line("markers", "mobile: marks tests as mobile tests")
-    config.addinivalue_line("markers", "web: marks tests as web tests")
-    config.addinivalue_line("markers", "database: marks tests as database tests")
     config.addinivalue_line("markers", "ui: marks tests as UI tests")
-    config.addinivalue_line(
-        "markers", "accessibility: marks tests as accessibility tests"
-    )
-    config.addinivalue_line("markers", "visual: marks tests as visual regression tests")
-    config.addinivalue_line("markers", "data_driven: marks tests as data-driven tests")
-    config.addinivalue_line("markers", "parallel: marks tests that can run in parallel")
-    config.addinivalue_line(
-        "markers", "sequential: marks tests that must run sequentially"
-    )
+    config.addinivalue_line("markers", "unit: marks tests as unit tests")
+    
+    # Set default timeout for all tests
+    config.addinivalue_line("addopts", "--timeout=300")
+    
+    # Configure test collection to be more efficient
+    config.addinivalue_line("addopts", "--tb=short")
+    
+    print("🔧 Pytest configured with custom markers and settings")
 
 
 def pytest_runtest_setup(item):
@@ -206,17 +230,21 @@ def pytest_runtest_teardown(item, nextitem):
 
 
 def pytest_collection_modifyitems(config, items):
-    """Modify test collection to add markers based on test location."""
+    """Modify test collection to add markers and handle slow tests."""
+    # Add markers based on test file location
     for item in items:
-        # Add markers based on test file location
-        if "unit" in str(item.fspath):
-            item.add_marker(pytest.mark.unit)
-        elif "integration" in str(item.fspath):
-            item.add_marker(pytest.mark.integration)
-        elif "e2e" in str(item.fspath):
-            item.add_marker(pytest.mark.e2e)
-        elif "api" in str(item.fspath):
+        if "test_api" in str(item.fspath):
             item.add_marker(pytest.mark.api)
+        elif "test_ui" in str(item.fspath) or "test_e2e" in str(item.fspath):
+            item.add_marker(pytest.mark.ui)
+        elif "test_unit" in str(item.fspath) or "test_math" in str(item.fspath):
+            item.add_marker(pytest.mark.unit)
+        
+        # Mark E2E tests as slow by default
+        if "test_ui" in str(item.fspath) or "test_e2e" in str(item.fspath):
+            item.add_marker(pytest.mark.slow)
+    
+    print(f"📋 Collected {len(items)} tests with appropriate markers")
 
 
 def pytest_html_report_title(report):

@@ -52,14 +52,16 @@ jobs:
     - name: Run E2E tests
       run: |
         echo "🧪 Starting E2E Tests..."
-        pytest tests/e2e/ -v --html=reports/e2e-report.html --self-contained-html
+        timeout 600 pytest tests/e2e/ -v --html=reports/e2e-report.html --self-contained-html --timeout=300 -x
         echo "✅ E2E tests completed"
+      timeout-minutes: 15
     
     - name: Run all tests together (final verification)
       run: |
         echo "🧪 Running final comprehensive test suite..."
-        pytest tests/ -v --html=reports/comprehensive-report.html --self-contained-html
+        timeout 900 pytest tests/ -v --html=reports/comprehensive-report.html --self-contained-html --timeout=300 -x
         echo "✅ All tests completed successfully"
+      timeout-minutes: 20
     
     - name: Upload test reports
       uses: actions/upload-artifact@v4
