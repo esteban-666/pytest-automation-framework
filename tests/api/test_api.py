@@ -40,7 +40,9 @@ class TestAPI:
         except:
             print(f"   Response Text: {response.text}")
 
-    @pytest.mark.xfail(reason="JSONPlaceholder API returns 500 for PUT requests to non-existent IDs")
+    @pytest.mark.xfail(
+        reason="JSONPlaceholder API returns 500 for PUT requests to non-existent IDs"
+    )
     def testJsonplaceholderCrudWorkflow(self):
         """
         Test JSONPlaceholder CRUD operations (Create, Read, Update, Delete)
@@ -137,7 +139,9 @@ class TestAPI:
 
             # Validate updated post
             print("\n   ✅ Validating updated post...")
-            assert updated_post["title"] == update_data["title"], "Updated title mismatch"
+            assert (
+                updated_post["title"] == update_data["title"]
+            ), "Updated title mismatch"
             assert updated_post["body"] == update_data["body"], "Updated body mismatch"
             print(f"   ✅ Post updated successfully: {updated_post['title']}")
         except Exception as e:
@@ -227,7 +231,9 @@ class TestAPI:
         assert "total" in users_data, "Total count missing"
         assert "data" in users_data, "Users data missing"
         assert isinstance(users_data["data"], list), "Users data should be a list"
-        print(f"   ✅ Users list retrieved successfully: {len(users_data['data'])} users")
+        print(
+            f"   ✅ Users list retrieved successfully: {len(users_data['data'])} users"
+        )
 
         # ===== STEP 3: GET SINGLE USER =====
         print("\n👤 STEP 3: Retrieving single user using GET method")
@@ -252,20 +258,21 @@ class TestAPI:
         assert "email" in user, "User email missing"
         assert "first_name" in user, "User first name missing"
         assert "last_name" in user, "User last name missing"
-        print(f"   ✅ User retrieved successfully: {user['first_name']} {user['last_name']}")
+        print(
+            f"   ✅ User retrieved successfully: {user['first_name']} {user['last_name']}"
+        )
 
         # ===== STEP 4: CREATE USER =====
         print("\n➕ STEP 4: Creating a new user using POST method")
         print("   Purpose: Test user creation")
         print("   Expected: Status 201 (Created) with created user data")
 
-        new_user_data = {
-            "name": "Test User",
-            "job": "QA Engineer"
-        }
+        new_user_data = {"name": "Test User", "job": "QA Engineer"}
         print(f"   New User Data: {json.dumps(new_user_data, indent=2)}")
 
-        create_user_response = self.reqres_client.post("/users", json_data=new_user_data)
+        create_user_response = self.reqres_client.post(
+            "/users", json_data=new_user_data
+        )
         self.log_response("CREATE USER Response", create_user_response, new_user_data)
 
         # Validate response
