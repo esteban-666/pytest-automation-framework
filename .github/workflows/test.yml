@@ -37,29 +37,35 @@ jobs:
     - name: Create reports directory
       run: mkdir -p reports
     
+    - name: Verify test collection
+      run: |
+        echo "🔍 Verifying test collection..."
+        timeout 60 pytest tests/ --collect-only -q
+        echo "✅ Test collection verified"
+    
     - name: Run unit tests with coverage
       run: |
         echo "🧪 Starting Unit Tests..."
-        pytest tests/unit/ -v --cov=utils --cov-report=xml --cov-report=term-missing --cov-report=html:reports/coverage
+        timeout 300 pytest tests/unit/ -v --cov=utils --cov-report=xml --cov-report=term-missing --cov-report=html:reports/coverage
         echo "✅ Unit tests completed"
     
     - name: Run API tests
       run: |
         echo "🧪 Starting API Tests..."
-        pytest tests/api/ -v --html=reports/api-report.html --self-contained-html
+        timeout 300 pytest tests/api/ -v --html=reports/api-report.html --self-contained-html
         echo "✅ API tests completed"
     
     - name: Run E2E tests
       run: |
         echo "🧪 Starting E2E Tests..."
-        timeout 600 pytest tests/e2e/ -v --html=reports/e2e-report.html --self-contained-html -x
+        timeout 600 pytest tests/e2e/ -v --html=reports/e2e-report.html --self-contained-html -x --collect-only-timeout=60
         echo "✅ E2E tests completed"
       timeout-minutes: 15
     
     - name: Run all tests together (final verification)
       run: |
         echo "🧪 Running final comprehensive test suite..."
-        timeout 900 pytest tests/ -v --html=reports/comprehensive-report.html --self-contained-html -x
+        timeout 900 pytest tests/ -v --html=reports/comprehensive-report.html --self-contained-html -x --collect-only-timeout=120
         echo "✅ All tests completed successfully"
       timeout-minutes: 20
     

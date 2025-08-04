@@ -233,15 +233,18 @@ def pytest_collection_modifyitems(config, items):
     """Modify test collection to add markers and handle slow tests."""
     # Add markers based on test file location
     for item in items:
-        if "test_api" in str(item.fspath):
+        # Use pathlib.Path for better compatibility
+        test_path = str(item.path)
+        
+        if "test_api" in test_path:
             item.add_marker(pytest.mark.api)
-        elif "test_ui" in str(item.fspath) or "test_e2e" in str(item.fspath):
+        elif "test_ui" in test_path or "test_e2e" in test_path:
             item.add_marker(pytest.mark.ui)
-        elif "test_unit" in str(item.fspath) or "test_math" in str(item.fspath):
+        elif "test_unit" in test_path or "test_math" in test_path:
             item.add_marker(pytest.mark.unit)
         
         # Mark E2E tests as slow by default
-        if "test_ui" in str(item.fspath) or "test_e2e" in str(item.fspath):
+        if "test_ui" in test_path or "test_e2e" in test_path:
             item.add_marker(pytest.mark.slow)
     
     print(f"📋 Collected {len(items)} tests with appropriate markers")
