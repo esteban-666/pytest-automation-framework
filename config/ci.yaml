@@ -1,0 +1,72 @@
+# CI Environment Configuration for GitHub Actions
+web:
+  base_url: "https://demoqa.com"  # Use actual test sites in CI
+  implicit_wait: 5  # Faster waits in CI
+  explicit_wait: 15  # Reduced explicit wait
+  page_load_timeout: 20  # Faster page loads
+  window_size:
+    width: 1920
+    height: 1080
+
+api:
+  base_url: "http://localhost:8000"
+  timeout: 15  # Reduced API timeout
+  headers:
+    Content-Type: "application/json"
+    Accept: "application/json"
+
+browser:
+  name: "chrome"
+  headless: true  # Always headless in CI
+  download_path: "./downloads"
+  performance_optimizations: true  # Enable for CI
+  ci_mode: true  # CI-specific flag
+
+reporting:
+  html_report: true
+  json_report: false  # Reduce artifacts in CI
+  xml_report: true
+  screenshot_on_failure: true
+  video_recording: false
+
+parallel:
+  enabled: false  # Disable parallelization in CI for stability
+  workers: 1
+  max_workers: 1
+
+retry:
+  enabled: true
+  max_retries: 2  # Allow more retries in CI
+  retry_delay: 2  # Slightly longer delay between retries
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/test.log"
+
+# Test data - using actual test sites
+test_data:
+  users:
+    demoqa:
+      username: "testuser"
+      password: "TestPass123!"
+    the_internet:
+      username: "tomsmith"
+      password: "SuperSecretPassword!"
+
+# Feature flags optimized for CI
+features:
+  new_ui: true
+  api_v2: false
+  mobile_testing: false
+  performance_testing: false
+  ci_optimizations: true
+  fast_fail: true  # Fail fast in CI
+
+# CI-specific timeouts (in seconds)
+timeouts:
+  webdriver_setup: 60
+  test_execution: 300
+  page_load: 20
+  element_wait: 15
+  script_execution: 20

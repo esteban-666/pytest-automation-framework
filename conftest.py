@@ -53,29 +53,37 @@ def driver(request) -> Generator:
     import signal
     from selenium.common.exceptions import WebDriverException
     
+    # Detect CI environment
+    is_ci = os.getenv("CI") == "true" or os.getenv("GITHUB_ACTIONS") == "true"
+    
     def timeout_handler(signum, frame):
         raise TimeoutError("WebDriver setup timed out")
     
+    # Set different timeouts for CI vs local
+    setup_timeout = 60 if is_ci else 30  # More time for CI setup
+    page_load_timeout = 20 if is_ci else 30  # Faster timeouts for CI
+    implicit_wait = 5 if is_ci else 10  # Faster implicit waits for CI
+    
     # Set a timeout for WebDriver setup
     signal.signal(signal.SIGALRM, timeout_handler)
-    signal.alarm(30)  # 30 second timeout
+    signal.alarm(setup_timeout)
     
     try:
-        print("🔧 Initializing WebDriver...")
+        print(f"🔧 Initializing WebDriver... (CI: {is_ci})")
         driver_manager = WebDriverManager()
         driver = driver_manager.get_driver()
 
-        # Set implicit wait
-        driver.implicitly_wait(10)
+        # Set implicit wait (shorter for CI)
+        driver.implicitly_wait(implicit_wait)
 
         # Set window size
         driver.set_window_size(1920, 1080)
         
-        # Set page load timeout
-        driver.set_page_load_timeout(30)
+        # Set page load timeout (shorter for CI)
+        driver.set_page_load_timeout(page_load_timeout)
         
-        # Set script timeout
-        driver.set_script_timeout(30)
+        # Set script timeout (shorter for CI)
+        driver.set_script_timeout(page_load_timeout)
         
         print("✅ WebDriver initialized successfully")
         signal.alarm(0)  # Cancel the alarm
@@ -85,6 +93,12 @@ def driver(request) -> Generator:
     except (WebDriverException, TimeoutError) as e:
         signal.alarm(0)  # Cancel the alarm
         print(f"❌ WebDriver initialization failed: {e}")
+        if is_ci:
+            # In CI, try to provide more debugging info
+            print("🔍 CI Environment Debug Info:")
+            print(f"   - DISPLAY: {os.getenv('DISPLAY', 'Not set')}")
+            print(f"   - CI: {os.getenv('CI', 'Not set')}")
+            print(f"   - GITHUB_ACTIONS: {os.getenv('GITHUB_ACTIONS', 'Not set')}")
         raise
     except Exception as e:
         signal.alarm(0)  # Cancel the alarm

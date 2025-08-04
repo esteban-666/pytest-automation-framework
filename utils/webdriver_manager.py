@@ -90,34 +90,31 @@ class WebDriverManager:
         """Get Chrome WebDriver instance."""
         options = ChromeOptions()
 
+        # Detect CI environment
+        is_ci = os.getenv("CI") == "true" or os.getenv("GITHUB_ACTIONS") == "true" or os.getenv("BROWSER_CI_MODE") == "true"
+        
+        # Override headless setting in CI
+        if is_ci or os.getenv("BROWSER_HEADLESS") == "true":
+            headless = True
+
         if headless:
             options.add_argument("--headless")
 
-        # Check if performance optimizations are enabled
-        enable_performance_optimizations = self.config.get("browser.performance_optimizations", True)
-
-        # Enhanced Chrome options for better performance
+        # Essential Chrome options for stability
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-gpu")
         options.add_argument("--disable-extensions")
-        options.add_argument("--disable-plugins")
-        options.add_argument("--disable-images")
-        options.add_argument("--disable-javascript")
-        options.add_argument("--disable-web-security")
-        options.add_argument("--allow-running-insecure-content")
         options.add_argument("--disable-blink-features=AutomationControlled")
         
-        # Memory and performance optimizations (only if enabled)
-        if enable_performance_optimizations:
-            logger.info("🚀 Performance optimizations enabled for Chrome")
-            options.add_argument("--memory-pressure-off")
-            options.add_argument("--max_old_space_size=4096")
+        # CI-specific optimizations
+        if is_ci:
+            logger.info("🚀 CI environment detected - applying CI-specific optimizations")
+            # Performance optimizations for CI
             options.add_argument("--disable-background-timer-throttling")
             options.add_argument("--disable-backgrounding-occluded-windows")
             options.add_argument("--disable-renderer-backgrounding")
             options.add_argument("--disable-features=TranslateUI")
-            options.add_argument("--disable-ipc-flooding-protection")
             options.add_argument("--disable-hang-monitor")
             options.add_argument("--disable-prompt-on-repost")
             options.add_argument("--disable-domain-reliability")
@@ -128,11 +125,24 @@ class WebDriverManager:
             options.add_argument("--disable-background-networking")
             options.add_argument("--disable-client-side-phishing-detection")
             options.add_argument("--disable-component-update")
-            options.add_argument("--disable-extensions-file-access-check")
-            options.add_argument("--disable-extensions-http-throttling")
-            options.add_argument("--disable-features=VizDisplayCompositor")
+            options.add_argument("--disable-ipc-flooding-protection")
+            options.add_argument("--memory-pressure-off")
+            options.add_argument("--max_old_space_size=4096")
+            # Reduce resource usage in CI
+            options.add_argument("--disable-plugins")
+            options.add_argument("--disable-background-networking")
+            options.add_argument("--disable-default-apps")
         else:
-            logger.info("⚡ Performance optimizations disabled for Chrome")
+            # Check if performance optimizations are enabled for local environment
+            enable_performance_optimizations = self.config.get("browser.performance_optimizations", False)
+            if enable_performance_optimizations:
+                logger.info("🚀 Performance optimizations enabled for Chrome")
+                options.add_argument("--memory-pressure-off")
+                options.add_argument("--disable-background-timer-throttling")
+                options.add_argument("--disable-backgrounding-occluded-windows")
+                options.add_argument("--disable-renderer-backgrounding")
+            else:
+                logger.info("⚡ Standard Chrome configuration")
         
         # Automation detection prevention
         options.add_experimental_option("excludeSwitches", ["enable-automation"])

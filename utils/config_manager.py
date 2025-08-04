@@ -75,13 +75,26 @@ class ConfigManager:
         }
 
         # Load environment-specific configuration
-        env = os.getenv("TEST_ENV", "staging")
+        # Auto-detect CI environment and use appropriate config
+        is_ci = os.getenv("CI") == "true" or os.getenv("GITHUB_ACTIONS") == "true"
+        if is_ci:
+            env = "ci"
+        else:
+            env = os.getenv("TEST_ENV", "local")
+        
         env_config_file = self.config_dir / f"{env}.yaml"
 
         if env_config_file.exists():
             with open(env_config_file, "r") as f:
                 env_config = yaml.safe_load(f) or {}
                 self._merge_config(default_config, env_config)
+        else:
+            # Fallback to local.yaml if environment-specific config doesn't exist
+            local_config_file = self.config_dir / "local.yaml"
+            if local_config_file.exists():
+                with open(local_config_file, "r") as f:
+                    env_config = yaml.safe_load(f) or {}
+                    self._merge_config(default_config, env_config)
 
         # Override with environment variables
         self._override_with_env_vars(default_config)
