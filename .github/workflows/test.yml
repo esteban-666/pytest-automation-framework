@@ -83,7 +83,7 @@ jobs:
         # Set Chrome flags for better performance
         export CHROME_FLAGS="--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --disable-extensions --disable-plugins --disable-images --disable-javascript --disable-web-security --allow-running-insecure-content --disable-blink-features=AutomationControlled --memory-pressure-off --max_old_space_size=4096"
         
-        timeout 600 pytest tests/e2e/ -v --html=reports/e2e-report.html --self-contained-html -x --workers=1
+        timeout 600 pytest tests/e2e/ -v --html=reports/e2e-report.html --self-contained-html -x
         echo "✅ E2E tests completed"
       timeout-minutes: 15
     
@@ -98,7 +98,7 @@ jobs:
         # Set Chrome flags for better performance
         export CHROME_FLAGS="--headless --no-sandbox --disable-dev-shm-usage --disable-gpu --disable-extensions --disable-plugins --disable-images --disable-javascript --disable-web-security --allow-running-insecure-content --disable-blink-features=AutomationControlled --memory-pressure-off --max_old_space_size=4096"
         
-        timeout 900 pytest tests/ -v --html=reports/comprehensive-report.html --self-contained-html -x --workers=1
+        timeout 900 pytest tests/ -v --html=reports/comprehensive-report.html --self-contained-html -x
         echo "✅ All tests completed successfully"
       timeout-minutes: 20
     
