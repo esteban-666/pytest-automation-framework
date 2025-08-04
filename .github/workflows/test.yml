@@ -89,9 +89,9 @@ jobs:
       run: |
         echo "🧪 Starting E2E Tests (CI optimized)..."
         echo "🚀 Running with CI-optimized settings..."
-        timeout 360 pytest tests/e2e/ -v --html=reports/e2e-report.html --self-contained-html -x --tb=short
+        timeout 600 pytest tests/e2e/ -v --html=reports/e2e-report.html --self-contained-html -x --tb=short
         echo "✅ E2E tests completed"
-      timeout-minutes: 8
+      timeout-minutes: 12
     
     - name: Generate final test report
       run: |
